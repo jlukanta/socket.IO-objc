@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v0.3.2 ARC
+//  v0.3.3 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -77,7 +77,8 @@ NSString* const SocketIOException = @"SocketIOException";
             isConnecting = _isConnecting, 
             useSecure = _useSecure, 
             delegate = _delegate,
-            heartbeatTimeout = _heartbeatTimeout;
+            heartbeatTimeout = _heartbeatTimeout,
+            returnAllDataFromAck = _returnAllDataFromAck;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate
 {
@@ -87,6 +88,7 @@ NSString* const SocketIOException = @"SocketIOException";
         _queue = [[NSMutableArray alloc] init];
         _ackCount = 0;
         _acks = [[NSMutableDictionary alloc] init];
+        _returnAllDataFromAck = NO;
     }
     return self;
 }
@@ -138,8 +140,11 @@ NSString* const SocketIOException = @"SocketIOException";
                                                  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
                                              timeoutInterval:10.0];
         
-        _handshake = [NSURLConnection connectionWithRequest:request 
-                                                   delegate:self];
+        _handshake = [[NSURLConnection alloc] initWithRequest:request
+                                                     delegate:self startImmediately:NO];
+        [_handshake scheduleInRunLoop:[NSRunLoop mainRunLoop]
+                              forMode:NSDefaultRunLoopMode];
+        [_handshake start];
         if (_handshake) {
             _httpRequestData = [NSMutableData data];
         }
@@ -500,7 +505,8 @@ NSString* const SocketIOException = @"SocketIOException";
                     id argsData = nil;
                     if (argsStr && ![argsStr isEqualToString:@""]) {
                         argsData = [SocketIOJSONSerialization objectFromJSONData:[argsStr dataUsingEncoding:NSUTF8StringEncoding] error:nil];
-                        if ([argsData count] > 0) {
+                        // either send complete response or only the first arg to callback
+                        if (!_returnAllDataFromAck && [argsData count] > 0) {
                             argsData = [argsData objectAtIndex:0];
                         }
                     }
@@ -583,7 +589,7 @@ NSString* const SocketIOException = @"SocketIOException";
 {
     // check for server status code (http://gigliwood.com/weblog/Cocoa/Q__When_is_an_conne.html)
     if ([response respondsToSelector:@selector(statusCode)]) {
-        int statusCode = [((NSHTTPURLResponse *)response) statusCode];
+        NSInteger statusCode = [((NSHTTPURLResponse *)response) statusCode];
         DEBUGLOG(@"didReceiveResponse() %i", statusCode);
         
         if (statusCode >= 400) {
@@ -667,7 +673,7 @@ NSString* const SocketIOException = @"SocketIOException";
             connectionFailed = true;
         }
         else {
-            // add small buffer of 7sec (magic xD)
+            // add small buffer of 7sec (magic xD) otherwise heartbeat will be too late and connection is closed
             _heartbeatTimeout += 7.0;
         }
         DEBUGLOG(@"heartbeatTimeout: %f", _heartbeatTimeout);
