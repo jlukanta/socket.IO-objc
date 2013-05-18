@@ -767,7 +767,10 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
     _endpoint = nil;
     
     _transport.delegate = nil;
-    [_transport close];
+    if (_isConnected || _isConnecting)
+    {
+        [_transport close];
+    }
     _transport = nil;
     
     [_timeout invalidate];
