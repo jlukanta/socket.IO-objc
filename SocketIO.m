@@ -766,6 +766,8 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
     _sid = nil;
     _endpoint = nil;
     
+    _transport.delegate = nil;
+    [_transport close];
     _transport = nil;
     
     [_timeout invalidate];
