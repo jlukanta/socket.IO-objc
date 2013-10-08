@@ -33,7 +33,7 @@ extern NSString * const SocketIOException;
 
 // Use by JSONKit serialization
 - (NSString *) JSONString;
-- (id) decoder;
+- (id) JSONDecoder;
 
 // Used by SBJsonWriter
 - (NSString *) stringWithObject:(id)object;
@@ -66,7 +66,10 @@ extern NSString * const SocketIOException;
     // lastly, try JSONKit
     serializer = NSClassFromString(@"JSONDecoder");
     if (serializer) {
-        return [[serializer decoder] objectWithData:data];
+        // [WARN] The method name here should really be decoder, but Apple complains that it conflicts
+        // with a private name, so gotta rename it to something else. If you are using JSONKit, make sure
+        // to rename the method in JSONKit to JSONDecoder so it matches with this line.
+        return [[serializer JSONDecoder] objectWithData:data];
     }
     
     // unable to find a suitable JSON deseralizer
