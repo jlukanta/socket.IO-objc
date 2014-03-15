@@ -622,7 +622,7 @@ NSString* const SocketIOException = @"SocketIOException";
     _isConnecting = NO;
     
     if ([_delegate respondsToSelector:@selector(socketIO:onError:)]) {
-        NSMutableDictionary *errorInfo = [NSDictionary dictionaryWithObject:error.localizedDescription forKey:NSLocalizedDescriptionKey];
+        NSMutableDictionary *errorInfo = [NSMutableDictionary dictionaryWithObject:error.localizedDescription forKey:NSLocalizedDescriptionKey];
         
         NSError *err = [NSError errorWithDomain:SocketIOError
                                            code:SocketIOHandshakeFailed
