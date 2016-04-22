@@ -150,7 +150,10 @@ NSString* const SocketIOException = @"SocketIOException";
         }
         else {
             // connection failed
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
             [self connection:_handshake didFailWithError:nil];
+#pragma clang diagnostic pop
         }
     }
 }
@@ -614,7 +617,7 @@ NSString* const SocketIOException = @"SocketIOException";
     [_httpRequestData appendData:data]; 
 }
 
-- (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error 
+- (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
     NSLog(@"ERROR: handshake failed ... %@", [error localizedDescription]);
     
