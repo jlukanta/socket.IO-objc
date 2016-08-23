@@ -37,6 +37,9 @@ static NSString* kSecureXHRURL = @"https://%@/socket.io/1/xhr-polling/%@";
 static NSString* kInsecureXHRPortURL = @"http://%@:%d/socket.io/1/xhr-polling/%@";
 static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 @interface SocketIOTransportXHR (Private)
 - (void) checkAndStartPoll;
 - (void) poll:(NSString *)data;
@@ -253,3 +256,5 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 
 
 @end
+
+#pragma clang diagnostic pop

@@ -45,6 +45,9 @@ static NSString* kSecureHandshakeURL = @"https://%@/socket.io/1/?t=%d%@";
 NSString* const SocketIOError     = @"SocketIOError";
 NSString* const SocketIOException = @"SocketIOException";
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 # pragma mark -
 # pragma mark SocketIO's private interface
 
@@ -785,3 +788,5 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 
 @end
+
+#pragma clang diagnostic pop
